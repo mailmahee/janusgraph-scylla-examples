@@ -8,3 +8,8 @@ __pycache__/
 
 # Data
 # *.csv
+
+# Ansible
+*.retry
+scylla_install_new.yaml
+servers.ini

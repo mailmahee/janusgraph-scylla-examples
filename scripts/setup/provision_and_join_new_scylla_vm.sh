@@ -18,7 +18,7 @@
 # Scylla
 CLUSTER_NAME="scylla-graph"
 SEED_NODES=""
-RELEASE="3.0.5"
+RELEASE="3.0"
 
 # GCP
 # TODO: Change the default project
@@ -26,7 +26,7 @@ PROJECT="symphony-graph17038"
 ZONE="us-west1-b"
 VM_TYPE="n1-standard-8"
 INTERNAL_IP=""
-SUBNET="graph-data-system-std"
+# SUBNET="graph-data-system-std"
 TAGS="scylla,graph-data-system"
 SSD_SIZE="40"
 NVME_NUM="2"
@@ -114,7 +114,7 @@ else
     disks create $DISK_NAME \
     --size $SSD_SIZE \
     --type "pd-ssd" \
-    --zone $ZONE &> /dev/null
+    --zone $ZONE
 
   # Create VM
   gcloud compute --project=$PROJECT \
@@ -141,7 +141,7 @@ sleep 45
 NEW_IP=`gcloud compute instances describe $INSTANCE_NAME --zone $ZONE | grep -i networkip | cut -d ":" -f2 | awk '{$1=$1};1'`
 # Generate servers.ini file for Ansible.
 echo "Creating inventory file (servers.ini) with VM  internal IP addresses"
-# echo "[scylla]" > servers.ini
+echo "[scylla]" > servers.ini
 echo $NEW_IP >> servers.ini
 
 
@@ -170,7 +170,7 @@ if [ "$LOCAL_SSD" == "YES" ]; then
   echo ""
   for i in `seq 1 $NVME_NUM`; do DISK=$DISK"/dev/nvme0n$i,"; done
   x=`echo "$DISK" | sed 's/,$//'`
-  sed -i -e s~\/dev\/sdb,\/dev\/sdc~$x~g scylla_install_new.yaml
+  sed -i -e s~\/dev\/sdb~$x~g scylla_install_new.yaml
 fi
 
 # Update remote_user name in playbook.yaml file.
@@ -181,8 +181,8 @@ sed -i -e s/remoteUser/$SSH_USERNAME/g scylla_install_new.yaml
 
 # Run the ansible playbook against the new IP
 # This finishes the Scylla node configuration
-# ansible-playbook scylla_install_new.yaml --private_key=$KEY_PATH -v -i "servers.ini"
-# ansible-playbook scylla_install_new.yaml --private_key=~/.ssh/ansible -v -i "servers.ini"
+# ansible-playbook scylla_install_new.yaml --private-key=$KEY_PATH -v -i "servers.ini"
+# ansible-playbook scylla_install_new.yaml --private-key=~/.ssh/ansible -v -i "servers.ini"
 # sed -i -e 's/^/#/' ~/.ssh/known_hosts
 echo ""
 echo "### Installing Scylla $RELEASE cluster using Ansible playbook"

@@ -48,4 +48,5 @@ gcloud container clusters create $CLUSTER_NAME \
   --zone $ZONE \
   --machine-type $VM_TYPE \
   --num-nodes 3 \
-  --cluster-version $KUBERNETES_VERSION
+  --cluster-version $KUBERNETES_VERSION \
+  --disk-size=40
