@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: janusgraph-server-deployment
+  labels:
+    app: janusgraph
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: janusgraph
+  template:
+    metadata:
+      labels:
+        app: janusgraph
+    spec:
+      containers:
+        - name: janusgraph
+          image: janusgraph/janusgraph:0.3.1
+          command: ["bin/gremlin-server.sh"]
+          # Add env vars to support different backends!
+          ports:
+            - containerPort: 8182

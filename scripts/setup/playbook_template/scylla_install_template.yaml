@@ -24,10 +24,14 @@
       tags:
        - prereq
     - name: Install epel-release and wget pkgs on CentOS
-      yum: name={{ item }} state=latest
-      with_items:
-       - epel-release
-       - wget
+      yum:
+        name:
+          - epel-release
+          - wget
+        state: latest
+      # with_items:
+      #  - epel-release
+      #  - wget
       tags:
        - prereq
     - name: Download Scylla {{ release }} repo for Centos 7

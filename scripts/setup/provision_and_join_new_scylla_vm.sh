@@ -21,6 +21,7 @@ SEED_NODES=""
 RELEASE="3.0.5"
 
 # GCP
+# TODO: Change the default project
 PROJECT="symphony-graph17038"
 ZONE="us-west1-b"
 VM_TYPE="n1-standard-8"
@@ -30,10 +31,10 @@ TAGS="scylla,graph-data-system"
 SSD_SIZE="40"
 NVME_NUM="2"
 LOCAL_SSD=NO
-CENTOS7="--image 'centos-7-v20190423' --image-project 'centos-cloud'"
-IMAGE=scylla3-base
-IMAGE_PROJECT=$PROJECT
-VM_OS="$CENTOS7"
+#CENTOS7="--image 'centos-7-v20190423' --image-project 'centos-cloud'"
+IMAGE='centos-7-v20190423'
+IMAGE_PROJECT='centos-cloud'
+#VM_OS="$CENTOS7"
 TIMESTAMP=`date "+%m-%d--%H%M"`
 
 # Ansible / SSH
@@ -94,7 +95,6 @@ if [ $LOCAL_SSD == "YES" ]; then
     instances create $INSTANCE_NAME \
     --zone $ZONE \
     --machine-type $VM_TYPE \
-    --subnet $SUBNET \
     --no-address \
     --maintenance-policy=MIGRATE \
     --private-network-ip $INTERNAL_IP \
@@ -122,7 +122,6 @@ else
     instances create $INSTANCE_NAME \
     --zone $ZONE \
     --machine-type $VM_TYPE \
-    --subnet $SUBNET \
     --no-address \
     --maintenance-policy=MIGRATE \
     --private-network-ip $INTERNAL_IP \
@@ -142,7 +141,7 @@ echo ""
 echo "Waiting 45 seconds for VM network to start prior to Scylla configuration."
 sleep 45
 
-NEW_IP=`gcloud compute instances describe $INSTANCE_NAME --zone $ZONE | grep -i networkip | cut -d ":" -f2 | awk '{$1:$1};1'`
+NEW_IP=`gcloud compute instances describe $INSTANCE_NAME --zone $ZONE | grep -i networkip | cut -d ":" -f2 | awk '{$1=$1};1'`
 # Generate servers.ini file for Ansible.
 echo "Creating inventory file (servers.ini) with VM  internal IP addresses"
 # echo "[scylla]" > servers.ini
@@ -159,7 +158,7 @@ else
   SEED_NODES=$NEW_IP
   echo "### Setting Seed IP as new IP $SEED_NODES in playbook yaml file."
 fi
-sed -e s/seedIP/$SEED_NODES/g -e s/scyllaVer/$RELEASE/g playbook_template/scylla_install_template.yaml > scylla_install_new.yaml
+sed -e s/seedIP/$SEED_NODES/g -e s/scyllaVer/$RELEASE/g scripts/setup/playbook_template/scylla_install_template.yaml > scylla_install_new.yaml
 
 # Update cluster name in playbook yaml file.
 echo ""
@@ -187,11 +186,11 @@ sed -i -e s/remoteUser/$SSH_USERNAME/g scylla_install_new.yaml
 # This finishes the Scylla node configuration
 # ansible-playbook scylla_install_new.yaml --private_key=$KEY_PATH -v -i "servers.ini"
 # ansible-playbook scylla_install_new.yaml --private_key=~/.ssh/ansible -v -i "servers.ini"
-sed -i -e 's/^/#/' ~/.ssh/known_hosts
+# sed -i -e 's/^/#/' ~/.ssh/known_hosts
 echo ""
 echo "### Installing Scylla $RELEASE cluster using Ansible playbook"
 echo ""
-ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook scylla_install_new.yaml --private_key=$KEY_PATH -v -i "servers.ini"
+ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook scylla_install_new.yaml --private-key=$KEY_PATH -v -i "servers.ini"
 
 # End message
 echo ""

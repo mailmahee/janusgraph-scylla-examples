@@ -4,6 +4,7 @@
 #
 # 2019 - Ryan Stauffer, Enharmonic, Inc.
 
+# TODO: Change the default project
 PROJECT="symphony-graph17038"
 
 # NETWORK=enharmonic
