@@ -44,11 +44,8 @@ while getopts ":hp:" opt; do
 done
 
 # Create a single zone cluster
-# TODO: Make this deployment more advanced
 gcloud container clusters create $CLUSTER_NAME \
   --zone $ZONE \
   --machine-type $VM_TYPE \
   --num-nodes 3 \
   --cluster-version $KUBERNETES_VERSION
-
-# TODO: Ensure scopes are appropriate for what we're doing

@@ -95,7 +95,6 @@ if [ $LOCAL_SSD == "YES" ]; then
     instances create $INSTANCE_NAME \
     --zone $ZONE \
     --machine-type $VM_TYPE \
-    --no-address \
     --maintenance-policy=MIGRATE \
     --private-network-ip $INTERNAL_IP \
     --scopes=https://www.googleapis.com/auth/devstorage.full_control,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
@@ -122,7 +121,6 @@ else
     instances create $INSTANCE_NAME \
     --zone $ZONE \
     --machine-type $VM_TYPE \
-    --no-address \
     --maintenance-policy=MIGRATE \
     --private-network-ip $INTERNAL_IP \
     --scopes=https://www.googleapis.com/auth/devstorage.full_control,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
@@ -132,7 +130,6 @@ else
     --metadata ssh-keys="$SSH_USERNAME:$(cat $KEY_PATH.pub)" \
     --boot-disk-size 20 --boot-disk-type "pd-ssd" \
     --boot-disk-device-name $INSTANCE_NAME
-
 fi
 
 # Wait for VM to come online before configuring Scylla with Ansible

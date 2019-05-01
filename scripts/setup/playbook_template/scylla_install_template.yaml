@@ -29,9 +29,6 @@
           - epel-release
           - wget
         state: latest
-      # with_items:
-      #  - epel-release
-      #  - wget
       tags:
        - prereq
     - name: Download Scylla {{ release }} repo for Centos 7
