@@ -1,0 +1,81 @@
+# This playbook template references the ScyllaDB template `scylla_install_orig.sh`
+# originally released under the Apache License, Version 2.0 and copyright ©2017 ScyllaDB
+# https://github.com/scylladb/scylla-code-samples/tree/master/gce_deploy_and_install_scylla_cluster
+#
+# Additions and modifications by
+# Ryan Stauffer, Enharmonic, Inc.
+## This playbook assumes you are installing Scylla using the same disks and NIC for all nodes ##
+
+---
+
+- hosts: [scylla]                               # Host group name from ini file
+  become: yes                                   # Run all tasks as root
+  vars:
+    release: scyllaVer                                # Scylla release to be installed
+    cluster_name: cluster_name_placeholder                  # Unique cluster name
+    seeds: seedIP                    # Need at least 1 live seed node for new nodes to join the cluster (use 1:3 ratio)
+    disks: /dev/sdb,/dev/sdc            # Disk names for raid0 creation (comma seperated)
+    NIC: eth0                    # NIC to be used with optimized queue
+  remote_user: remoteUser
+  tasks:
+    - name: Remove 'abrt' pkg from CentOS
+      yum: name=abrt state=absent
+      when: ansible_distribution == 'CentOS'
+      tags:
+       - prereq
+    - name: Install epel-release and wget pkgs on CentOS
+      yum: name={{ item }} state=latest
+      with_items:
+       - epel-release
+       - wget
+      tags:
+       - prereq
+    - name: Download Scylla {{ release }} repo for Centos 7
+      get_url: url=http://downloads.scylladb.com/rpm/centos/scylla-{{release}}.repo dest=/etc/yum.repos.d/scylla.repo
+      when: ansible_distribution == 'CentOS'
+      tags:
+       - repo
+    - name: Install scylla {{ release }} on CentOS
+      package: name=scylla state=present
+      when: ansible_distribution == 'CentOS'
+      tags:
+       - install
+    - name: Enable SSTable 3.0 in scylla.yaml file
+      lineinfile:
+        path: /etc/scylla/scylla.yaml
+        line: 'enable_sstables_mc_format: true'
+      tags:
+        - conf
+    - name: Set cluster name in yaml file
+      shell: sed -i -- 's/Test Cluster/{{ cluster_name }}/g' /etc/scylla/scylla.yaml
+      tags:
+       - conf
+    - name: Uncomment Cluster name
+      shell: sed -i -- 's/#cluster_name/cluster_name/g' /etc/scylla/scylla.yaml
+      tags:
+       - conf
+    - name: Set seed node IP in yaml file
+      shell: sed -i -- '/seeds/s/127.0.0.1/{{ seeds }}/g' /etc/scylla/scylla.yaml
+      tags:
+       - conf
+    - name: Set listen address + rpc address in yaml file
+      shell: sed -i -- "s/localhost/$(hostname -i)/g" /etc/scylla/scylla.yaml
+      tags:
+       - conf
+    - name: Run Scylla Setup (RAID-0, XFS format, NIC queue, disk IOtune), this may take a while
+      shell: scylla_setup --disks {{ disks }} --nic {{ NIC }} --setup-nic
+      tags:
+       - conf
+    - name: Reboot server/s (required by Scylla)
+      become: yes
+      shell: sleep 2 && shutdown -r now "Ansible reboot"
+      async: 1
+      poll: 0
+      ignore_errors: true
+      tags:
+       - reboot
+    - name: Wait for server/s to come up from boot
+      local_action: wait_for host={{ inventory_hostname }} state=started port=22 delay=30 timeout=300 connect_timeout=60
+      become: false
+      tags:
+       - reboot

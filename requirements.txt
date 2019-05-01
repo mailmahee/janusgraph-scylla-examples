@@ -1,6 +1,0 @@
-aenum==2.1.2
-certifi==2019.3.9
-gremlinpython==3.4.0
-ruamel.yaml==0.15.94
-six==1.12.0
-tornado==4.5.3
