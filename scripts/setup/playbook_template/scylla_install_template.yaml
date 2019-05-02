@@ -49,7 +49,6 @@
         - conf
     - name: Set cluster name in yaml file
       shell: sed -i -- 's/Test Cluster/{{ cluster_name }}/g' /etc/scylla/scylla.yaml
-      warn: false
       tags:
        - conf
     - name: Uncomment Cluster name

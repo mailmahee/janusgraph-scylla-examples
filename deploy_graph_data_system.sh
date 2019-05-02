@@ -33,9 +33,9 @@ sh scripts/setup/setup_gke.sh
 
 # Deploy Scylla w/ standard SSDs (comment if deploying w/ local SSDs)
 # TODO: Add wrapper script for VM deployment
-sh scripts/setup/provision_and_join_new_scylla_vm.sh -c GraphDev -i 10.138.0.5 -t n1-standard-4 -s 100
-sh scripts/setup/provision_and_join_new_scylla_vm.sh -c GraphDev -n 10.138.0.2 -i 10.138.0.3 -t n1-standard-4 -s 100
-sh scripts/setup/provision_and_join_new_scylla_vm.sh -c GraphDev -n 10.138.0.2 -i 10.138.0.4 -t n1-standard-4 -s 100
+sh scripts/setup/provision_and_join_new_scylla_vm.sh -c GraphDev -i 10.138.0.3 -t n1-standard-4 -s 100
+sh scripts/setup/provision_and_join_new_scylla_vm.sh -c GraphDev -n 10.138.0.3 -i 10.138.0.2 -t n1-standard-4 -s 100
+sh scripts/setup/provision_and_join_new_scylla_vm.sh -c GraphDev -n 10.138.0.3 -i 10.138.0.4 -t n1-standard-4 -s 100
 
 # Deploy Elasticsearch
 kubectl apply -f k8s/elasticsearch/es-storage.yaml
