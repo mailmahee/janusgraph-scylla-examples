@@ -11,7 +11,7 @@ PROJECT="symphony-graph17038"
 CLUSTER_NAME=graph-deployment
 ZONE="us-west1-b"
 VM_TYPE="n1-standard-4"
-KUBERNETES_VERSION="1.12.7-gke.10"
+KUBERNETES_VERSION="1.11.8-gke.6"
 
 while getopts ":hp:" opt; do
   case $opt in
@@ -50,3 +50,17 @@ gcloud container clusters create $CLUSTER_NAME \
   --num-nodes 3 \
   --cluster-version $KUBERNETES_VERSION \
   --disk-size=40
+
+# Setup network rules to allow GKE workloads to communicate w/ VMs on same network
+
+# Get cluster network
+# gcloud container clusters describe graph-deployment --format=get"(network)"
+CLUSTER_NETWORK=$(gcloud container clusters describe $CLUSTER_NAME --format=get"(network)" --zone $ZONE)
+
+# Get cluster IPv4CIDR
+# gcloud container clusters describe graph-deployment --format=get"(clusterIpv4Cidr)"
+CLUSTER_IPV4_CIDR=$(gcloud container clusters describe $CLUSTER_NAME --format=get"(clusterIpv4Cidr)" --zone $ZONE)
+
+# Create a firewall rule for the network, with the CIDR as the source range, and allow all protocols:
+
+gcloud compute firewall-rules create "$CLUSTER_NAME-to-all-vms-on-network" --network="$CLUSTER_NETWORK" --source-ranges="$CLUSTER_IPV4_CIDR" --allow=tcp,udp,icmp,esp,ah,sctp

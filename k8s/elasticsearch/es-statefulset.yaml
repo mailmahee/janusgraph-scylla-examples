@@ -78,7 +78,7 @@ spec:
                   fieldPath: metadata.name
             # Tell Elastcsearch nodes where to connect to other nodes
             - name: discovery.zen.ping.unicast.hosts
-              value: "elasticsearch-0.es.default.svc.cluster.local,elasticsearch-1.es.default.svc.cluster.local,elasticsearch-2.es.default.svc.cluster.local"
+              value: "elasticsearch-0.elasticsearch.default.svc.cluster.local,elasticsearch-1.elasticsearch.default.svc.cluster.local,elasticsearch-2.elasticsearch.default.svc.cluster.local"
             # Adjust Heap size as needed
             - name: ES_JAVA_OPTS
               value: -Xms1024m -Xmx1024m

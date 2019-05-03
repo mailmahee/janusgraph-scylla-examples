@@ -9,7 +9,6 @@ spec:
     - name: janusgraph
       # TODO: Use sed to replace PROJECT placeholder for custom deployment
       image: gcr.io/symphony-graph17038/janusgraph:0.3.1
-      # TODO: Add env vars to support different backends!
       env:
         - name: JANUS_PROPS_TEMPLATE
           value: cql-es
@@ -18,4 +17,4 @@ spec:
         - name: janusgraph.storage.cql.keyspace
           value: graphdemo
         - name: janusgraph.index.search.hostname
-          value: elasticsearch-0.es.default.svc.cluster.local,elasticsearch-1.es.default.svc.cluster.local,elasticsearch-2.es.default.svc.cluster.local
+          value: elasticsearch-0.elasticsearch.default.svc.cluster.local,elasticsearch-1.elasticsearch.default.svc.cluster.local,elasticsearch-2.elasticsearch.default.svc.cluster.local
