@@ -62,5 +62,4 @@ CLUSTER_NETWORK=$(gcloud container clusters describe $CLUSTER_NAME --format=get"
 CLUSTER_IPV4_CIDR=$(gcloud container clusters describe $CLUSTER_NAME --format=get"(clusterIpv4Cidr)" --zone $ZONE)
 
 # Create a firewall rule for the network, with the CIDR as the source range, and allow all protocols:
-
 gcloud compute firewall-rules create "$CLUSTER_NAME-to-all-vms-on-network" --network="$CLUSTER_NETWORK" --source-ranges="$CLUSTER_IPV4_CIDR" --allow=tcp,udp,icmp,esp,ah,sctp
