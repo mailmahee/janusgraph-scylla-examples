@@ -34,15 +34,11 @@ flags.DEFINE_integer(
     'Limit the number of rows to try to insert from provided data file. '
     '(Useful for initial testing)')
 
-
-ROW_LIMIT = FLAGS.row_limit
-
+FLAGS = flags.FLAGS
 
 # DEFAULT_VARS
 DEFAULT_HOST = 'localhost'
 DEFAULT_PORT = 8182
-
-ROW_LIMIT = 1000
 
 
 def get_traversal_source(host=None, port=None):
@@ -192,7 +188,7 @@ def load_from_csv(filename, record_mapping, g):
             if row_count % 100 == 0:
                 print("Loaded {0} rows".format(row_count))
 
-            if ROW_LIMIT and row_count >= ROW_LIMIT:
+            if FLAGS.row_limit and row_count >= FLAGS.row_limit:
                 break
 
     end_time = timer()
