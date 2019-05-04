@@ -29,8 +29,14 @@ flags.DEFINE_string(
 flags.DEFINE_string(
     'hostname', None,
     'Gremlin Server hostname where we want to connect and load the data.')
+flags.DEFINE_integer(
+    'row_limit', None,
+    'Limit the number of rows to try to insert from provided data file. '
+    '(Useful for initial testing)')
 
-FLAGS = flags.FLAGS
+
+ROW_LIMIT = FLAGS.row_limit
+
 
 # DEFAULT_VARS
 DEFAULT_HOST = 'localhost'
@@ -124,19 +130,37 @@ def upsert_edge(record, edge_mapping, g):
 
     try:
         traversal = g.V().hasLabel(edge_mapping['out_vertex']['vertex_label'])
-        # insertion_traversal = __.V().hasLabel(edge_mapping['out_vertex']['vertex_label'])
+        insertion_traversal = __.V().hasLabel(edge_mapping['out_vertex']['vertex_label'])
 
         for prop_key, lookup_value in out_lookup_values.items():
             traversal = traversal.has(prop_key, lookup_value)
-            # insertion_traversal = insertion_traversal.has(prop_key, lookup_value)
+            insertion_traversal = insertion_traversal.has(prop_key, lookup_value)
 
         traversal = traversal.as_('out').V().hasLabel(edge_mapping['in_vertex']['vertex_label'])
-        # insertion_traversal
+        insertion_traversal = insertion_traversal.as_('out2').V().hasLabel(edge_mapping['in_vertex']['vertex_label'])
 
         for prop_key, lookup_value in in_lookup_values.items():
             traversal = traversal.has(prop_key, lookup_value)
+            insertion_traversal = insertion_traversal.has(prop_key, lookup_value)
+
+        insertion_traversal = insertion_traversal.addE(edge_label).from_('out2')
         traversal = traversal.as_('in').inE(edge_label).as_('e').outV().where(P.eq('out')).fold().coalesce(
-                __.unfold(), __.addE(edge_label).from_('out').to('in')).next()
+                __.unfold(), insertion_traversal).next()
+
+    #     # traversal.addE(edge_label).from_('out').next()
+    #         g.V().has('Contribution', 'transactionId', '1062111').as('out').
+    #             V().has('Candidate', 'filerCommitteeIdNumber', 'C00695510').as('in').
+    #             inE('CONTRIBUTION_TO').as('e').outV().where(eq('out')).fold().coalesce(
+    #                 unfold(), addE('CONTRIBUTION_TO').from('out').to('in')).next()
+    #
+    #         g.V().has('Contribution', 'transactionId', '1062112').as_('out').V().has('Candidate', 'filerCommitteeIdNumber', 'C00695510').as_('in').inE('CONTRIBUTION_TO').as_('e').outV().where(P.eq('out')).select('e').fold().coalesce(__.unfold(), __.addE('CONTRIBUTION_TO').from_('out').to('in')).next()
+    #
+    # g.V().has('Contribution', 'transactionId', '1062111').as('out').
+    #     V().has('Candidate', 'filerCommitteeIdNumber', 'C00695510').as('in').addE('CONTRIBUTION_TO').from('out').to('in')
+    #
+    #         traversal = traversal.as_('in').inE(edge_label).as_('e').outV().in('out').fold().coalesce(
+    #                 __.unfold(), __.addE(edge_label).from_('out').to('in')).next()
+
     except:
         print("Edge error - skipping: {0}({1}) --{2}-> {3}({4})".format(
                 edge_mapping['out_vertex']['vertex_label'],
@@ -165,11 +189,11 @@ def load_from_csv(filename, record_mapping, g):
 
             row_count += 1
 
-            if row_count >= ROW_LIMIT:
-                break
-
             if row_count % 100 == 0:
                 print("Loaded {0} rows".format(row_count))
+
+            if ROW_LIMIT and row_count >= ROW_LIMIT:
+                break
 
     end_time = timer()
     load_time = end_time - start_time
