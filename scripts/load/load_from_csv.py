@@ -8,12 +8,30 @@ from __future__ import print_function
 import csv
 from timeit import default_timer as timer
 
+from absl import app
+from absl import flags
+
 from ruamel.yaml import YAML
 
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from gremlin_python.process.graph_traversal import __
 
+# ARGS FLAGS
+flags.DEFINE_string(
+    'data', None,
+    'Path to the source data to be loaded into the graph.')
+flags.DEFINE_string(
+    'mapping', None,
+    'Path to the mapping file used to determine the objects that '
+    'will be loaded into the graph from the data file.')
+flags.DEFINE_string(
+    'hostname', None,
+    'Gremlin Server hostname where we want to connect and load the data.')
+
+FLAGS = flags.FLAGS
+
+# DEFAULT_VARS
 DEFAULT_HOST = 'localhost'
 DEFAULT_PORT = 8182
 
@@ -151,17 +169,25 @@ def get_record_mapping_from_yaml(filename):
     return record_mapping
 
 
-if __name__ == '__main__':
-    # TODO: Add argument for IP address
-    g = get_traversal_source('localhost', 8182)
+def main(argv):
+    if not FLAGS.data:
+        print('Error: Data file path must be supplied (--data).')
+        return
+    if not FLAGS.mapping:
+        print('Error: Mapping file path must be supplied (--mapping).')
+        return
+    if not FLAGS.hostname:
+        print('Error: Gremlin Server hostname must be supplied (--hostname).')
+        return
 
-    # TODO: Arg arg for filename
-    filename = '/Users/ryan/Projects/CampaignFinance/data/Contributions.csv'
+    g = get_traversal_source(FLAGS.hostname, 8182)
 
-    # TODO: Add arg for record mapping yaml filename
-    record_mapping_yaml = '/Users/ryan/Projects/Enharmonic/janustools-py/resources/campaign_mapping.yaml'
-    # TODO: Fix column names - reemove space...
-    record_mapping = get_record_mapping_from_yaml(record_mapping_yaml)
-    load_from_csv(filename, record_mapping, g)
+    # TODO: Fix column names - remove space...
+    record_mapping = get_record_mapping_from_yaml(FLAGS.mapping)
+    load_from_csv(FLAGS.data, record_mapping, g)
 
     get_element_counts(record_mapping)
+
+
+if __name__ == '__main__':
+    app.run(main)

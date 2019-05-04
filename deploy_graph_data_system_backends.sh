@@ -42,5 +42,5 @@ kubectl apply -f k8s/elasticsearch/es-storage.yaml
 kubectl apply -f k8s/elasticsearch/es-service.yaml
 kubectl apply -f k8s/elasticsearch/es-statefulset.yaml
 
-# Deploy JanusGraph
+# Deploy JanusGraph image
 scripts/setup/build_and_deploy_janusgraph_image.sh
