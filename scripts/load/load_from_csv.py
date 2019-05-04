@@ -94,19 +94,22 @@ def insert_vertex(record, vertex_mapping, g):
         return
 
     # Setup traversals
-    traversal = g.V().hasLabel(vertex_label)
-    insertion_traversal = __.addV(vertex_label).property('type', vertex_label)
+    try:
+        traversal = g.V().hasLabel(vertex_label)
+        insertion_traversal = __.addV(vertex_label).property('type', vertex_label)
 
-    for prop_key, lookup_value in lookup_values.items():
-        traversal = traversal.has(prop_key, lookup_value)
-        insertion_traversal = insertion_traversal.property(prop_key, lookup_value)
+        for prop_key, lookup_value in lookup_values.items():
+            traversal = traversal.has(prop_key, lookup_value)
+            insertion_traversal = insertion_traversal.property(prop_key, lookup_value)
 
-    # Add Vertex insertion partial traversal
-    for source_field, prop_key in vertex_mapping['other_properties'].items():
-        insertion_traversal = insertion_traversal.property(prop_key,
-                                                           record[source_field])
+        # Add Vertex insertion partial traversal
+        for source_field, prop_key in vertex_mapping['other_properties'].items():
+            insertion_traversal = insertion_traversal.property(prop_key,
+                                                               record[source_field])
 
-    traversal.fold().coalesce(__.unfold(), insertion_traversal).next()
+        traversal.fold().coalesce(__.unfold(), insertion_traversal).next()
+    except:
+        print("Vertex already exists: {0}({1})".format(vertex_label, lookup_values)
 
 
 def insert_edge(record, edge_mapping, g):
@@ -118,19 +121,28 @@ def insert_edge(record, edge_mapping, g):
     if out_lookup_values is None or in_lookup_values is None:
         return
 
+    try:
+        traversal = g.V().hasLabel(edge_mapping['out_vertex']['vertex_label'])
+        for prop_key, lookup_value in out_lookup_values.items():
+            traversal = traversal.has(prop_key, lookup_value)
 
-    traversal = g.V().hasLabel(edge_mapping['out_vertex']['vertex_label'])
-    for prop_key, lookup_value in out_lookup_values.items():
-        traversal = traversal.has(prop_key, lookup_value)
-
-    traversal = traversal.as_('out').V().hasLabel(edge_mapping['in_vertex']['vertex_label'])
-    for prop_key, lookup_value in in_lookup_values.items():
-        traversal = traversal.has(prop_key, lookup_value)
-    traversal.addE(edge_label).from_('out').next()
+        traversal = traversal.as_('out').V().hasLabel(edge_mapping['in_vertex']['vertex_label'])
+        for prop_key, lookup_value in in_lookup_values.items():
+            traversal = traversal.has(prop_key, lookup_value)
+        traversal.addE(edge_label).from_('out').next()
+        return True
+    except:
+        print("Edge already exists: {0}({1}) --{2}-> {3}({4})".format(
+                edge_mapping['out_vertex']['vertex_label'],
+                out_lookup_values,
+                edge_label,
+                edge_mapping['in_vertex']['vertex_label'],
+                in_lookup_values))
 
 
 def load_from_csv(filename, record_mapping, g):
     """Loads vertices and edges from a csv file, based on a record mapping."""
+    print("Loading rows from CSV into Graph")
     start_time = timer()
     with open(filename, 'r') as f:
         reader = csv.DictReader(f)

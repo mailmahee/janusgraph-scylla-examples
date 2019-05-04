@@ -20,7 +20,7 @@
 # Create a new environment and install prereqs
 conda create --name graphdev python=3.7 -y
 conda activate graphdev
-pip install ruamel-yaml==0.15.94 ansible==2.7.10 gremlinpython==3.4.0
+pip install ruamel-yaml==0.15.94 ansible==2.7.10 gremlinpython==3.4.0 absl-py==0.7.1
 
 sh scripts/setup/setup_ansible_key.sh
 # sh scripts/setup/setup_networking.sh
