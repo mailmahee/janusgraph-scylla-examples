@@ -135,8 +135,8 @@ def upsert_edge(record, edge_mapping, g):
         for prop_key, lookup_value in in_lookup_values.items():
             traversal = traversal.has(prop_key, lookup_value)
         traversal = traversal.as_('in')
-        traversal.inE(edge_label).as_('e').from('out').fold().coalesce(
-                __.unfold(), __.addE(edge_label).from('out').to('in')).next()
+        traversal.inE(edge_label).as_('e').from_('out').fold().coalesce(
+                __.unfold(), __.addE(edge_label).from_('out').to('in')).next()
         )
         # traversal.addE(edge_label).from_('out').next()
     except:
