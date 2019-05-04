@@ -61,7 +61,7 @@ def get_element_counts(expected_elements, g):
     for vertex_label in unique_vertices: #expected_elements['vertices']:
         # vertex_label = vertex['vertex_label']
         print('{0} {1} vertices'.format(
-                g.V().hasLabel(vertex_label).count().next(), vertex_label))
+                g.V().has('type', vertex_label).count().next(), vertex_label))
 
     unique_edges = set([edge['edge_label'] for edge in expected_elements['edges']])
     for edge_label in unique_edges: # expected_elements['edges']:
