@@ -51,7 +51,7 @@ def get_traversal_source(host=None, port=None):
     return g
 
 
-def get_element_counts(expected_elements):
+def get_element_counts(expected_elements, g):
     """Queries the graph for counts of entities loaded."""
     start_time = timer()
     unique_vertices = set([vertex['vertex_label'] for vertex in expected_elements['vertices']])
@@ -109,7 +109,7 @@ def insert_vertex(record, vertex_mapping, g):
 
         traversal.fold().coalesce(__.unfold(), insertion_traversal).next()
     except:
-        print("Vertex already exists: {0}({1})".format(vertex_label, lookup_values)
+        print("Vertex error - skipping: {0}({1})".format(vertex_label, lookup_values))
 
 
 def insert_edge(record, edge_mapping, g):
@@ -123,16 +123,24 @@ def insert_edge(record, edge_mapping, g):
 
     try:
         traversal = g.V().hasLabel(edge_mapping['out_vertex']['vertex_label'])
+        # insertion_traversal = __.V().hasLabel(edge_mapping['out_vertex']['vertex_label'])
+
         for prop_key, lookup_value in out_lookup_values.items():
             traversal = traversal.has(prop_key, lookup_value)
+            # insertion_traversal = insertion_traversal.has(prop_key, lookup_value)
 
         traversal = traversal.as_('out').V().hasLabel(edge_mapping['in_vertex']['vertex_label'])
+        # insertion_traversal
+
         for prop_key, lookup_value in in_lookup_values.items():
             traversal = traversal.has(prop_key, lookup_value)
-        traversal.addE(edge_label).from_('out').next()
-        return True
+        traversal = traversal.as_('in')
+        traversal.inE(edge_label).as('e').from('out').fold().coalesce(
+                __.unfold(), __.addE(edge_label).from('out').to('in')).next()
+        )
+        # traversal.addE(edge_label).from_('out').next()
     except:
-        print("Edge already exists: {0}({1}) --{2}-> {3}({4})".format(
+        print("Edge error - skipping: {0}({1}) --{2}-> {3}({4})".format(
                 edge_mapping['out_vertex']['vertex_label'],
                 out_lookup_values,
                 edge_label,
@@ -168,7 +176,7 @@ def load_from_csv(filename, record_mapping, g):
     end_time = timer()
     load_time = end_time - start_time
 
-    print('Load time: {0:.1f} sec'.format(load_time))
+    print('Load time: {0:.1f} sec - {1} records'.format(load_time, row_count))
     print('({0:.1f} records / sec)'.format(row_count / load_time))
 
 
@@ -198,7 +206,7 @@ def main(argv):
     record_mapping = get_record_mapping_from_yaml(FLAGS.mapping)
     load_from_csv(FLAGS.data, record_mapping, g)
 
-    get_element_counts(record_mapping)
+    get_element_counts(record_mapping, g)
 
 
 if __name__ == '__main__':
