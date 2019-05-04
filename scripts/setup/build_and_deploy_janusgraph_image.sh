@@ -12,7 +12,5 @@ cd janusgraph-docker
 sudo ./build-images.sh 0.3
 sudo docker tag janusgraph/janusgraph:0.3.1 gcr.io/$PROJECT/janusgraph:0.3.1
 sudo gcloud auth configure-docker
-sudo docker push gcr.io/$PROJECT/janusgraph:0.3.1
-
 # Push the image to your project GCR
-kubectl run jg-new --image=gcr.io/symphony-graph17038/janusgraph:0.3.1
+sudo docker push gcr.io/$PROJECT/janusgraph:0.3.1

@@ -121,4 +121,39 @@ mgmt.addConnection(ZIP, IndividualContributor, Zipcode)
 mgmt.commit()
 
 // Add basic indices
-// TODO: Add indices
+mgmt = graph.openManagement()
+mgmt.buildIndex("byType", Vertex.class).addKey(mgmt.getPropertyKey("type")).buildCompositeIndex()
+mgmt.buildIndex("byCandidateIdNumber", Vertex.class).addKey(mgmt.getPropertyKey("filerCommitteeIdNumber")).
+  unique().indexOnly(mgmt.getVertexLabel("Candidate")).buildCompositeIndex()
+mgmt.buildIndex("byContributionTransactionId", Vertex.class).addKey(mgmt.getPropertyKey("transactionId")).
+  unique().indexOnly(mgmt.getVertexLabel("Contribution")).buildCompositeIndex()
+mgmt.buildIndex("byOrganizationContributorName", Vertex.class).addKey(mgmt.getPropertyKey("organizationName")).
+  unique().indexOnly(mgmt.getVertexLabel("OrganizationContributor")).buildCompositeIndex()
+mgmt.buildIndex("byIndividualContributorName", Vertex.class).
+  addKey(mgmt.getPropertyKey("firstName")).addKey(mgmt.getPropertyKey("lastName")).
+  unique().indexOnly(mgmt.getVertexLabel("IndividualContributor")).buildCompositeIndex()
+mgmt.buildIndex("byStateAbbreviation", Vertex.class).addKey(mgmt.getPropertyKey("postalAbbreviation")).
+  unique().indexOnly(mgmt.getVertexLabel("State")).buildCompositeIndex()
+mgmt.buildIndex("byZipcodeFiveDigit", Vertex.class).addKey(mgmt.getPropertyKey("fiveDigit")).
+  unique().indexOnly(mgmt.getVertexLabel("Zipcode")).buildCompositeIndex()
+
+mgmt.commit()
+
+
+// Ensure all indices are enabled
+graph.getOpenTransactions().forEach { tx -> tx.rollback() }
+mgmt = graph.openManagement()
+mgmt.getGraphIndexes(Vertex.class).forEach { idx ->
+  if (idx.getIndexStatus(idx.fieldKeys[0]) == SchemaStatus.INSTALLED) {
+    mgmt.updateIndex(idx, SchemaAction.REGISTER_INDEX).get()
+  }
+}
+mgmt.commit()
+sleep(5000)
+mgmt = graph.openManagement()
+mgmt.getGraphIndexes(Vertex.class).forEach { idx ->
+  if (idx.getIndexStatus(idx.fieldKeys[0]) == SchemaStatus.REGISTERED) {
+    mgmt.updateIndex(idx, SchemaAction.ENABLE_INDEX).get()
+  }
+}
+mgmt.commit()
