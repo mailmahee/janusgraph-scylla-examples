@@ -16,6 +16,7 @@ from ruamel.yaml import YAML
 from gremlin_python.process.anonymous_traversal import traversal
 from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
 from gremlin_python.process.graph_traversal import __
+from gremlin_python.process.traversal import P
 
 # ARGS FLAGS
 flags.DEFINE_string(
@@ -134,11 +135,8 @@ def upsert_edge(record, edge_mapping, g):
 
         for prop_key, lookup_value in in_lookup_values.items():
             traversal = traversal.has(prop_key, lookup_value)
-        traversal = traversal.as_('in')
-        traversal.inE(edge_label).as_('e').from_('out').fold().coalesce(
+        traversal = traversal.as_('in').inE(edge_label).as_('e').outV().where(P.eq('out')).fold().coalesce(
                 __.unfold(), __.addE(edge_label).from_('out').to('in')).next()
-        )
-        # traversal.addE(edge_label).from_('out').next()
     except:
         print("Edge error - skipping: {0}({1}) --{2}-> {3}({4})".format(
                 edge_mapping['out_vertex']['vertex_label'],
