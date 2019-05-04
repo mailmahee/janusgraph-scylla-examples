@@ -85,7 +85,7 @@ def get_lookup_values(record, lookup_properties):
 
 
 
-def insert_vertex(record, vertex_mapping, g):
+def upsert_vertex(record, vertex_mapping, g):
     vertex_label = vertex_mapping['vertex_label']
 
     # Ensure all lookup values are present first
@@ -112,7 +112,7 @@ def insert_vertex(record, vertex_mapping, g):
         print("Vertex error - skipping: {0}({1})".format(vertex_label, lookup_values))
 
 
-def insert_edge(record, edge_mapping, g):
+def upsert_edge(record, edge_mapping, g):
     edge_label = edge_mapping['edge_label']
     # Simple logic, requiring that Vertices must exist before edge can be added.
     # Ensure all lookup values are present first
@@ -135,7 +135,7 @@ def insert_edge(record, edge_mapping, g):
         for prop_key, lookup_value in in_lookup_values.items():
             traversal = traversal.has(prop_key, lookup_value)
         traversal = traversal.as_('in')
-        traversal.inE(edge_label).as('e').from('out').fold().coalesce(
+        traversal.inE(edge_label).as_('e').from('out').fold().coalesce(
                 __.unfold(), __.addE(edge_label).from('out').to('in')).next()
         )
         # traversal.addE(edge_label).from_('out').next()
@@ -159,11 +159,11 @@ def load_from_csv(filename, record_mapping, g):
         for row in reader:
             # Insert graph entities from record.
             for vertex_mapping in record_mapping['vertices']:
-                insert_vertex(row, vertex_mapping, g)
+                upsert_vertex(row, vertex_mapping, g)
 
             # Count as we go?
             for edge_mapping in record_mapping['edges']:
-                insert_edge(row, edge_mapping, g)
+                upsert_edge(row, edge_mapping, g)
 
             row_count += 1
 
