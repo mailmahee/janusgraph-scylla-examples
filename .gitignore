@@ -6,12 +6,10 @@ __pycache__/
 # MacOSX
 .DS_Store
 
-# Data
-# *.csv
-
 # Ansible
 *.retry
 scylla_install_new.yaml
 servers.ini
 
 setup_networking.sh
+*.backup

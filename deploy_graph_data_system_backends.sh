@@ -23,16 +23,11 @@ conda activate graphdev
 pip install ruamel-yaml==0.15.94 ansible==2.7.10 gremlinpython==3.4.0 absl-py==0.7.1
 
 sh scripts/setup/setup_ansible_key.sh
-# sh scripts/setup/setup_networking.sh
 
 # Setup GKE Cluster
 sh scripts/setup/setup_gke.sh
 
-# Uncomment to deploy Scylla w/ Local SSDs
-# scripts/provision_and_join_new_scylla_vm.sh -c GraphDev -i 10.138.0.5 -t n1-standard-4
-
 # Deploy Scylla w/ standard SSDs (comment if deploying w/ local SSDs)
-# TODO: Add wrapper script for VM deployment
 sh scripts/setup/provision_and_join_new_scylla_vm.sh -c GraphDev -i 10.138.0.3 -t n1-standard-4 -s 100
 sh scripts/setup/provision_and_join_new_scylla_vm.sh -c GraphDev -n 10.138.0.3 -i 10.138.0.2 -t n1-standard-4 -s 100
 sh scripts/setup/provision_and_join_new_scylla_vm.sh -c GraphDev -n 10.138.0.3 -i 10.138.0.4 -t n1-standard-4 -s 100

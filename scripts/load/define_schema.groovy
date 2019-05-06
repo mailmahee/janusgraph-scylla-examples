@@ -1,15 +1,9 @@
 // Define Schema and setup
 //
-// Run with a Gremlin Console from the command line:
-// $ bin/gremlin -i define_schema.groovy janusgraph-config.properties
-
-janusGraphConfig = args[0]
-println("Using JanusGraph Configuration {janusGraphConfig}")
+// Run from a Gremlin Console after defining the JanusGraphConfig filepath
+// (In our test deployment, it is '/etc/opt/janusgraph/janusgraph.properties')
+janusGraphConfig = '/etc/opt/janusgraph/janusgraph.properties'
 graph = JanusGraphFactory.open(janusGraphConfig)
-
-// Install Print Schema tool
-//TODO: ADD THIS HERE
-
 
 //-----------------------
 // Load the Initial Schema

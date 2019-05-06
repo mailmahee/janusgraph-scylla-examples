@@ -14,7 +14,7 @@ vertices:
       FormType: formType
       ContributionType: contributionType
       Itemized: itemized
-      FirstTime Donor: firstTimeDonor
+      FirstTimeDonor: firstTimeDonor
       FirstTimeItemized: firstTimeItemized
 
   - vertex_label: OrganizationContributor

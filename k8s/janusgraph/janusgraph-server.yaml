@@ -16,17 +16,14 @@ spec:
     spec:
       containers:
         - name: janusgraph
-          # TODO: Use sed to replace PROJECT placeholder for custom deployment
-          image: gcr.io/symphony-graph17038/janusgraph:0.3.1
-          # command:
-          #   - bin/gremlin-server.sh
-          # args:
-          #   -
+          # TODO: Replace PROJECT placeholder for your deployment
+          image: gcr.io/[PROJECT]/janusgraph:0.3.1
           env:
             - name: JANUS_PROPS_TEMPLATE
               value: cql-es
+              # TODO: Update hostname to point to JanusGraph IP
             - name: janusgraph.storage.hostname
-              value: 10.138.0.3
+              value: [HOSTNAME]
             - name: janusgraph.storage.cql.keyspace
               value: graphdemo
             - name: janusgraph.index.search.hostname

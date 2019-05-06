@@ -220,7 +220,6 @@ def main(argv):
 
     g = get_traversal_source(FLAGS.hostname, 8182)
 
-    # TODO: Fix column names - remove space...
     record_mapping = get_record_mapping_from_yaml(FLAGS.mapping)
     load_from_csv(FLAGS.data, record_mapping, g)
 

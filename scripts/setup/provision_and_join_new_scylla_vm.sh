@@ -21,20 +21,16 @@ SEED_NODES=""
 RELEASE="3.0"
 
 # GCP
-# TODO: Change the default project
-PROJECT="symphony-graph17038"
+PROJECT="default-project"
 ZONE="us-west1-b"
 VM_TYPE="n1-standard-8"
 INTERNAL_IP=""
-# SUBNET="graph-data-system-std"
 TAGS="scylla,graph-data-system"
 SSD_SIZE="40"
 NVME_NUM="2"
 LOCAL_SSD=NO
-#CENTOS7="--image 'centos-7-v20190423' --image-project 'centos-cloud'"
 IMAGE='centos-7-v20190423'
 IMAGE_PROJECT='centos-cloud'
-#VM_OS="$CENTOS7"
 TIMESTAMP=`date "+%m-%d--%H%M"`
 
 # Ansible / SSH
@@ -44,9 +40,7 @@ KEY_PATH=$HOME/.ssh/$SSH_USERNAME
 while getopts ":hlp:z:s:c:t:n:i:" opt; do
   case $opt in
     h) echo ""
-       echo "Automated Data System Deployment"
        echo "Scylla Node Deployment"
-       echo "©2019 Enharmonic, Inc."
        echo ""
        echo "Description"
        echo "==========="

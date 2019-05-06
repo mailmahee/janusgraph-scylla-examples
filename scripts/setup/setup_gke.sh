@@ -4,11 +4,9 @@
 #
 # 2019 - Ryan Stauffer, Enharmonic, Inc.
 
-# TODO: Change the default project
-PROJECT="symphony-graph17038"
+PROJECT="default-project"
 
-# NETWORK=enharmonic
-CLUSTER_NAME=graph-deployment
+CLUSTER_NAME="graph-deployment"
 ZONE="us-west1-b"
 VM_TYPE="n1-standard-4"
 KUBERNETES_VERSION="1.11.8-gke.6"
@@ -18,7 +16,6 @@ while getopts ":hp:" opt; do
     h) echo ""
        echo "Automated Data System Deployment"
        echo "GKE Setup"
-       echo "©2019 Enharmonic, Inc."
        echo ""
        echo "Description"
        echo "==========="
@@ -54,11 +51,9 @@ gcloud container clusters create $CLUSTER_NAME \
 # Setup network rules to allow GKE workloads to communicate w/ VMs on same network
 
 # Get cluster network
-# gcloud container clusters describe graph-deployment --format=get"(network)"
 CLUSTER_NETWORK=$(gcloud container clusters describe $CLUSTER_NAME --format=get"(network)" --zone $ZONE)
 
 # Get cluster IPv4CIDR
-# gcloud container clusters describe graph-deployment --format=get"(clusterIpv4Cidr)"
 CLUSTER_IPV4_CIDR=$(gcloud container clusters describe $CLUSTER_NAME --format=get"(clusterIpv4Cidr)" --zone $ZONE)
 
 # Create a firewall rule for the network, with the CIDR as the source range, and allow all protocols:
