@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Load FEC data from a csv file into JanusGraph."""
+"""Load data from a csv file into JanusGraph."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -58,14 +58,12 @@ def get_element_counts(expected_elements, g):
     """Queries the graph for counts of entities loaded."""
     start_time = timer()
     unique_vertices = set([vertex['vertex_label'] for vertex in expected_elements['vertices']])
-    for vertex_label in unique_vertices: #expected_elements['vertices']:
-        # vertex_label = vertex['vertex_label']
+    for vertex_label in unique_vertices:
         print('{0} {1} vertices'.format(
                 g.V().has('type', vertex_label).count().next(), vertex_label))
 
     unique_edges = set([edge['edge_label'] for edge in expected_elements['edges']])
-    for edge_label in unique_edges: # expected_elements['edges']:
-        # edge_label = edge['edge_label']
+    for edge_label in unique_edges:
         print('{0} {1} edges'.format(
                 g.E().hasLabel(edge_label).count().next(), edge_label))
 
@@ -142,20 +140,6 @@ def upsert_edge(record, edge_mapping, g):
         insertion_traversal = insertion_traversal.addE(edge_label).from_('out2')
         traversal = traversal.as_('in').inE(edge_label).as_('e').outV().where(P.eq('out')).fold().coalesce(
                 __.unfold(), insertion_traversal).next()
-
-    #     # traversal.addE(edge_label).from_('out').next()
-    #         g.V().has('Contribution', 'transactionId', '1062111').as('out').
-    #             V().has('Candidate', 'filerCommitteeIdNumber', 'C00695510').as('in').
-    #             inE('CONTRIBUTION_TO').as('e').outV().where(eq('out')).fold().coalesce(
-    #                 unfold(), addE('CONTRIBUTION_TO').from('out').to('in')).next()
-    #
-    #         g.V().has('Contribution', 'transactionId', '1062112').as_('out').V().has('Candidate', 'filerCommitteeIdNumber', 'C00695510').as_('in').inE('CONTRIBUTION_TO').as_('e').outV().where(P.eq('out')).select('e').fold().coalesce(__.unfold(), __.addE('CONTRIBUTION_TO').from_('out').to('in')).next()
-    #
-    # g.V().has('Contribution', 'transactionId', '1062111').as('out').
-    #     V().has('Candidate', 'filerCommitteeIdNumber', 'C00695510').as('in').addE('CONTRIBUTION_TO').from('out').to('in')
-    #
-    #         traversal = traversal.as_('in').inE(edge_label).as_('e').outV().in('out').fold().coalesce(
-    #                 __.unfold(), __.addE(edge_label).from_('out').to('in')).next()
 
     except:
         print("Edge error - skipping: {0}({1}) --{2}-> {3}({4})".format(

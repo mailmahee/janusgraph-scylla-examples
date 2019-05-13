@@ -14,7 +14,7 @@ spec:
           value: cql-es
           # TODO: Update hostname to point to JanusGraph IP
         - name: janusgraph.storage.hostname
-          value: 10.138.0.3
+          value: 10.138.0.2
         - name: janusgraph.storage.cql.keyspace
           value: graphdemo
         - name: janusgraph.index.search.hostname

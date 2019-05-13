@@ -143,7 +143,7 @@ mgmt.getGraphIndexes(Vertex.class).forEach { idx ->
   }
 }
 mgmt.commit()
-sleep(5000)
+sleep(20000)
 mgmt = graph.openManagement()
 mgmt.getGraphIndexes(Vertex.class).forEach { idx ->
   if (idx.getIndexStatus(idx.fieldKeys[0]) == SchemaStatus.REGISTERED) {

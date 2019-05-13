@@ -9,7 +9,6 @@ PROJECT="default-project"
 while getopts ":hp:" opt; do
   case $opt in
     h) echo ""
-       echo "Automated Data System Deployment"
        echo "Build and deploy JanusGraph image"
        echo ""
        echo "Description"

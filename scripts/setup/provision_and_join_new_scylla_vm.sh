@@ -186,7 +186,7 @@ ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook scylla_install_new.yaml --priva
 # End message
 echo ""
 echo "### New Scylla VM @ $NEW_IP should be running and joining the ring."
-echo "### Loging to one of the nodes and run 'nodetools status'"
+echo "### Login to one of the nodes and run 'nodetools status'"
 echo "### Note: it may take up to 1 minutes for the node to join the ring."
 echo ""
 echo ""
